@@ -1,4 +1,4 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://slowgradient.com/'
 locale = 'en-us'
 title = 'Slow Gradient'
 theme = 'hugo-tufte'
