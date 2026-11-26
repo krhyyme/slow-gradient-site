@@ -1,4 +1,9 @@
-# Builds the site on every PR (as a check) and deploys main to GitHub Pages.
+# Builds the site and deploys it to Cloudflare Pages:
+#   - push to main  -> production (slowgradient.com)
+#   - pull request  -> preview at <branch>.slow-gradient.pages.dev
+#
+# Requires repo secrets CLOUDFLARE_API_TOKEN (Account > Cloudflare Pages: Edit)
+# and CLOUDFLARE_ACCOUNT_ID.
 name: Build and deploy
 
 on:
@@ -9,20 +14,23 @@ on:
 
 permissions:
   contents: read
+  deployments: write  # lets wrangler report deployments back to GitHub
 
-# One deploy at a time; let an in-progress deploy finish rather than cancel it.
 concurrency:
-  group: pages-${{ github.ref }}
-  cancel-in-progress: false
+  group: deploy-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   # Keep in sync with your local versions (`hugo version`, `sass --version`).
   HUGO_VERSION: 0.170.1
   DART_SASS_VERSION: 1.108.2
+  CLOUDFLARE_PROJECT: slow-gradient
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      HAS_CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     steps:
       - name: Checkout (with theme submodule)
         uses: actions/checkout@v7
@@ -50,23 +58,15 @@ jobs:
           sass --version
           hugo --gc --minify
 
-      - name: Upload Pages artifact
-        if: github.event_name != 'pull_request'
-        uses: actions/upload-pages-artifact@v5
+      # Skipped until the Cloudflare secrets exist, so PRs still get a build check.
+      - name: Deploy to Cloudflare Pages
+        if: env.HAS_CF_TOKEN == 'true'
+        uses: cloudflare/wrangler-action@v4
         with:
-          path: ./public
-
-  deploy:
-    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v5
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          command: >-
+            pages deploy public
+            --project-name=${{ env.CLOUDFLARE_PROJECT }}
+            --branch=${{ github.head_ref || github.ref_name }}
