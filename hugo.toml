@@ -1,3 +1,28 @@
 baseURL = 'https://example.org/'
 locale = 'en-us'
-title = 'My New Hugo Project'
+title = 'Slow Gradient'
+theme = 'hugo-tufte'
+
+[pagination]
+  pagerSize = 5
+
+[markup.goldmark.renderer]
+  unsafe = true  # required by the theme's sidenote/margin-note shortcodes
+[markup.goldmark.extensions.passthrough]
+  enable = true  # leave LaTeX untouched by Markdown; KaTeX renders it client-side
+  [markup.goldmark.extensions.passthrough.delimiters]
+    block = [['\[', '\]'], ['$$', '$$']]
+    inline = [['\(', '\)'], ['$', '$']]
+[markup.highlight]
+  noClasses = true  # inline styles; the theme ships no Chroma CSS
+  style = 'github'
+  guessSyntax = true
+
+[params]
+  math = true
+  KaTeXVersion = '0.18.11'
+  KaTeXCDN = 'https://cdn.jsdelivr.net/npm'
+  marginNoteInd = '⊕'
+  showSummary = true
+  showPoweredBy = false
+  codeblocksdark = false
