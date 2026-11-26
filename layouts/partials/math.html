@@ -1,14 +1,3 @@
-{{- /* Overrides the theme's math.html: Hugo's goldmark passthrough extension
-       (see hugo.toml) keeps $...$ / $$...$$ intact, so KaTeX just renders them. */ -}}
+{{- /* Overrides the theme's math.html. Math is rendered server-side by
+       _markup/render-passthrough.html, so only KaTeX's stylesheet is needed. */ -}}
 <link rel="stylesheet" href="{{ .Site.Params.KaTeXCDN }}/katex@{{ .Site.Params.KaTeXVersion }}/dist/katex.min.css" crossorigin="anonymous">
-<script defer src="{{ .Site.Params.KaTeXCDN }}/katex@{{ .Site.Params.KaTeXVersion }}/dist/katex.min.js" crossorigin="anonymous"></script>
-<script defer src="{{ .Site.Params.KaTeXCDN }}/katex@{{ .Site.Params.KaTeXVersion }}/dist/contrib/auto-render.min.js" crossorigin="anonymous"
-  onload="renderMathInElement(document.body, {
-    delimiters: [
-      {left: '$$', right: '$$', display: true},
-      {left: '\\[', right: '\\]', display: true},
-      {left: '$', right: '$', display: false},
-      {left: '\\(', right: '\\)', display: false}
-    ],
-    throwOnError: false
-  });"></script>

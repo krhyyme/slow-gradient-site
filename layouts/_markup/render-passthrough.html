@@ -1,0 +1,10 @@
+{{- /* Render $...$ / $$...$$ to KaTeX HTML at build time (no client JS).
+       Display math is wrapped in <p> so Tufte CSS gives it body width and size. */ -}}
+{{- $opts := dict "output" "htmlAndMathml" "displayMode" (eq .Type "block") -}}
+{{- with try (transform.ToMath .Inner $opts) -}}
+  {{- with .Err -}}
+    {{- errorf "Unable to render math %q in %s: %s" $.Inner $.Page.String . -}}
+  {{- else -}}
+    {{- if eq $.Type "block" -}}<p class="math-display">{{ .Value }}</p>{{- else -}}{{ .Value }}{{- end -}}
+  {{- end -}}
+{{- end -}}
