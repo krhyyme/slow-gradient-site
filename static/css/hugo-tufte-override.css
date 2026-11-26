@@ -1,0 +1,15 @@
+/* Site overrides, loaded after the theme's styles (see head-includes.html). */
+
+/* The theme sets `:root * { text-align: left }`, which blocks KaTeX's
+   inherited alignment and left-aligns display equations. Let KaTeX's own
+   (more specific) rules apply and everything else inherit. */
+.katex * {
+  text-align: inherit;
+}
+
+/* Display math is wrapped in <p class="math-display"> by
+   _markup/render-passthrough.html so it gets Tufte's body width and size. */
+p.math-display {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}
